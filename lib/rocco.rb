@@ -448,7 +448,10 @@ class Rocco
 
   # Convert Markdown to classy HTML.
   def process_markdown(text)
-    Redcarpet::Markdown.new(Redcarpet::Render::HTML).render(text)
+    Redcarpet::Markdown.new(Redcarpet::Render::HTML, {
+      :fenced_code_blocks=>true, 
+      :no_intra_emphasis=>true, 
+    }).render(text)
   end
 
   # We `popen` a read/write pygmentize process in the parent and
