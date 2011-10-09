@@ -49,12 +49,6 @@ require 'mustache'
 # We use `Net::HTTP` to highlight code via <http://pygments.appspot.com>
 require 'net/http'
 
-# Code is run through [Pygments](http://pygments.org/) for syntax
-# highlighting. If it's not installed, locally, use a webservice.
-if !ENV['PATH'].split(':').any? { |dir| File.executable?("#{dir}/pygmentize") }
-  warn "WARNING: Pygments not found. Using webservice."
-end
-
 #### Public Interface
 
 # `Rocco.new` takes a source `filename`, an optional list of source filenames
@@ -160,8 +154,13 @@ class Rocco
 
   # Returns `true` if `pygmentize` is available locally, `false` otherwise.
   def pygmentize?
-    @_pygmentize ||= ENV['PATH'].split(':').
-      any? { |dir| File.executable?("#{dir}/pygmentize") }
+    @_pygmentize ||= begin
+      ENV['PATH'].split(':').any? { |dir| File.executable?("#{dir}/pygmentize") }.tap do |_pygmentize|
+        # Code is run through [Pygments](http://pygments.org/) for syntax
+        # highlighting. If it's not installed, locally, use a webservice.
+        warn "WARNING: Pygments not found. Using webservice." unless _pygmentize
+      end
+    end
   end
 
   # If `pygmentize` is available, we can use it to autodetect a file's
